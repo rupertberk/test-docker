@@ -1,0 +1,71 @@
+version: '2'
+# Define the services/containers to be run
+# http://anandmanisankar.com/posts/docker-container-nginx-node-redis-example/
+# bug in nginx docker environment substitution
+# https://github.com/docker-library/docs/issues/496
+
+services:
+  web:
+    # image: nginx # possible issue in naming image same as dockerhub images
+    build: ./nginx
+    # environment:
+    #   - SERVER_NAME=local.aikidoseattle.org
+    #   - SSL_CERT_PATH=/etc/letsencrypt/live/local.aikidoseattle.org/fullchain.pem
+    #   - SSL_KEY_PATH=/etc/letsencrypt/live/local.aikidoseattle.org/privkey.pem
+    env_file:
+     - development.env
+    # volumes:
+    #   - letsencrypt_certs:/etc/letsencrypt
+    #   - letsencrypt_www:/var/www/letsencrypt
+    # volumes:
+    #   - .:/etc/nginx/
+    links:
+      - app:app
+      # - letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    # restart: always
+    # tty: true
+    command: /bin/bash -c "envsubst '$$SSL_CERT_PATH $$SSL_KEY_PATH $$SERVER_NAME' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+    #command:  /bin/bash -c 'envsubst "`printf '${%s} ' $(bash -c "compgen -A variable")`" < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf && nginx -g "daemon off;"'
+    # command: envsubst "`printf '${%s} ' $(bash -c "compgen -A variable")`" < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf
+
+  app: # name of the app
+    build: test-node # specify the directory of the Dockerfile
+    # volumes:
+    #   - ../aikido-nodejs:/usr/app
+    env_file:
+      - development.env
+    links:
+      - database
+    # expose:
+    #   - "3000"
+    # - "${APP_PORT}"
+
+  database: # name of the db service
+    image: mongo # specify image to build container from
+    # ports:
+    #   - "27017:27017" # specify port forewarding
+    expose:
+      - "27017" 
+
+  database-backup:
+    image: halvves/mongodb-backup-s3
+    env_file:
+      - development.env
+    links:
+      - database
+
+# for letsencrypt, can only run container on public network with static IP; for non-public, create self-signed cert
+# see https://community.letsencrypt.org/t/certificates-for-hosts-on-private-networks/174
+
+#   letsencrypt:
+#     image: certbot/certbot:latest
+#     volumes:
+#       - letsencrypt_certs:/etc/letsencrypt
+#       - letsencrypt_www:/var/lib/letsencrypt
+
+# volumes:
+#   - letsencrypt_certs
+#   - letsencrypt_www
