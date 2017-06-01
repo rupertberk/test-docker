@@ -8,17 +8,12 @@ services:
   web:
     # image: nginx # possible issue in naming image same as dockerhub images
     build: ./nginx
-    # environment:
-    #   - SERVER_NAME=local.aikidoseattle.org
-    #   - SSL_CERT_PATH=/etc/letsencrypt/live/local.aikidoseattle.org/fullchain.pem
-    #   - SSL_KEY_PATH=/etc/letsencrypt/live/local.aikidoseattle.org/privkey.pem
+
     env_file:
      - development.env
     # volumes:
     #   - letsencrypt_certs:/etc/letsencrypt
     #   - letsencrypt_www:/var/www/letsencrypt
-    # volumes:
-    #   - .:/etc/nginx/
     links:
       - app:app
       # - letsencrypt
@@ -33,8 +28,6 @@ services:
 
   app: # name of the app
     build: test-node # specify the directory of the Dockerfile
-    # volumes:
-    #   - ../aikido-nodejs:/usr/app
     env_file:
       - development.env
     links:
