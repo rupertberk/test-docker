@@ -5,11 +5,11 @@ var app = express();
 var mongoose = require('mongoose');
 var dotenv = require('dotenv').config;
 
-var db = 'mongodb://database/admin';
+var db = 'mongodb://database/test';
 mongoose.connect(db); 
 
 var model = mongoose.model('Test', new mongoose.Schema({ name: String }));
-console.log(model.db.host); // localhost
+console.log(model.db.host); // "database"
 console.log(model.db.port); // 27017
 console.log(model.db.name); // myDatabase
 
