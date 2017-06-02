@@ -3,6 +3,8 @@
 ## app settings
 - NODE_ENV=development
 - APP_PORT=3000
+
+## web settings
 - SERVER_NAME=example.com
 - SSL_CERT_PATH=/etc/letsencrypt/live/example.com/fullchain.pem
 - SSL_KEY_PATH=/etc/letsencrypt/live/example.com/privkey.pem

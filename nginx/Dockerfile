@@ -13,6 +13,8 @@ FROM nginx:stable
 # ADD /ssl/fullchain.pem #{SSL_CERT_PATH}
 # ADD /ssl/privkey.pem #{SSL_CERT_KEY_PATH}
 
+#https://codefresh.io/blog/using-docker-generate-ssl-certificates/
+
 ADD ./ssl/local.aikidoseattle.org/fullchain.pem /etc/letsencrypt/live/local.aikidoseattle.org/fullchain.pem
 ADD ./ssl/local.aikidoseattle.org/privkey.pem /etc/letsencrypt/live/local.aikidoseattle.org/privkey.pem
 

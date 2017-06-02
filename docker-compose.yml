@@ -22,7 +22,7 @@ services:
       - "443:443"
     # restart: always
     # tty: true
-    command: /bin/bash -c "envsubst '$$SSL_CERT_PATH $$SSL_KEY_PATH $$SERVER_NAME' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+    command: /bin/bash -c "envsubst '$$SSL_CERT_PATH $$SSL_KEY_PATH $$SERVER_NAME $$APP_PORT' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
     #command:  /bin/bash -c 'envsubst "`printf '${%s} ' $(bash -c "compgen -A variable")`" < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf && nginx -g "daemon off;"'
     # command: envsubst "`printf '${%s} ' $(bash -c "compgen -A variable")`" < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf
 
