@@ -5,18 +5,23 @@ version: '2'
 # https://github.com/docker-library/docs/issues/496
 
 services:
+  # configure a web server
   web:
     # image: nginx # possible issue in naming image same as dockerhub images
     build: ./nginx
 
     env_file:
      - development.env
-    # volumes:
-    #   - letsencrypt_certs:/etc/letsencrypt
-    #   - letsencrypt_www:/var/www/letsencrypt
+    # args:
+    #  - NODE_ENV: 'development' #$NODE_ENV
+    volumes:
+      - localcerts:/etc/nginx/ssl
+      - letsencrypt_certs:/etc/letsencrypt
+      - letsencrypt_www:/var/www/letsencrypt
     links:
       - app:app
-      # - letsencrypt
+      - letsencrypt
+      - localcert
     ports:
       - "80:80"
       - "443:443"
@@ -26,6 +31,7 @@ services:
     #command:  /bin/bash -c 'envsubst "`printf '${%s} ' $(bash -c "compgen -A variable")`" < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf && nginx -g "daemon off;"'
     # command: envsubst "`printf '${%s} ' $(bash -c "compgen -A variable")`" < /tmp/nginx.conf > /etc/nginx/conf.d/default.conf
 
+  # configure the application
   app: # name of the app
     build: test-node # specify the directory of the Dockerfile
     env_file:
@@ -36,6 +42,7 @@ services:
     #   - "3000"
     # - "${APP_PORT}"
 
+  # configure the database
   database: # name of the db service
     image: mongo # specify image to build container from
     # ports:
@@ -43,6 +50,7 @@ services:
     expose:
       - "27017" 
 
+  # run the database backup service
   database-backup:
     image: halvves/mongodb-backup-s3
     env_file:
@@ -50,15 +58,22 @@ services:
     links:
       - database
 
-# for letsencrypt, can only run container on public network with static IP; for non-public, create self-signed cert
-# see https://community.letsencrypt.org/t/certificates-for-hosts-on-private-networks/174
+  # for letsencrypt, can only run container on public network with static IP; for non-public, create self-signed cert
+  # see https://community.letsencrypt.org/t/certificates-for-hosts-on-private-networks/174
+  letsencrypt:
+    image: certbot/certbot:latest
+    volumes:
+      - letsencrypt_certs:/etc/letsencrypt
+      - letsencrypt_www:/var/lib/letsencrypt
 
-#   letsencrypt:
-#     image: certbot/certbot:latest
-#     volumes:
-#       - letsencrypt_certs:/etc/letsencrypt
-#       - letsencrypt_www:/var/lib/letsencrypt
-
-# volumes:
-#   - letsencrypt_certs
-#   - letsencrypt_www
+  # build a local developmemt certificate
+  localcert:
+    build: ./localcert
+    env_file:
+      - development.env
+    volumes:
+      - localcerts:/etc/nginx/ssl
+volumes:
+  localcerts:
+  letsencrypt_certs:
+  letsencrypt_www:

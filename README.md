@@ -18,3 +18,6 @@
 - BUCKET=
 - AWS_SECRET_ACCESS_KEY=
 - AWS_ACCESS_KEY_ID=
+
+
+docker run --rm --env-file ../development.env -it ca31bc53dc2d /bin/bash
